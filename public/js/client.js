@@ -1,11 +1,6 @@
 import '../css/style.scss';
 import HalloClient from 'hallo-client'
 
-let mediaConstraints = {
-  audio: false,
-  video: { width: 480, height: 270 },
-}
-
 const iceServers = {
   iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
 }
@@ -51,9 +46,10 @@ function render() {
   }, "")
 }
 
-hallo.join(window.location.pathname, mediaConstraints, {addLocalStream, addRemoteStream, removeRemoteStream})
+const showWebcam = () => navigator.mediaDevices.getUserMedia({ audio: false, video: true })
+const showMonitor = () => navigator.mediaDevices.getDisplayMedia({ video: {displaySurface: "monitor"} })
 
-document.getElementById('toggle').addEventListener('click', () => {
-  mediaConstraints.audio = !mediaConstraints.audio
-  hallo.changeConstraints(mediaConstraints)
-})
+hallo.join(window.location.pathname, showWebcam, {addLocalStream, addRemoteStream, removeRemoteStream})
+
+document.getElementById('show-monitor').onclick = () => hallo.changeMediaLambda(showMonitor)
+document.getElementById('show-webcam').onclick = () => hallo.changeMediaLambda(showWebcam)
