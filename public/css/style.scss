@@ -1,0 +1,16 @@
+body {
+  margin: 0;
+  font-size: 20px;
+}
+
+#videos {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  & > .video {
+    height: 50%;
+    width: 50%;
+  }
+}
