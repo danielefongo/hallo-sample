@@ -13,8 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "hallo-client": "^0.0.1",
-    "hallo-server": "^0.0.1"
+    "hallo-client": "^0.0.2",
+    "hallo-server": "^0.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

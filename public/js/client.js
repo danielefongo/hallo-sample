@@ -1,7 +1,7 @@
 import '../css/style.scss';
 import HalloClient from 'hallo-client'
 
-const mediaConstraints = {
+let mediaConstraints = {
   audio: false,
   video: { width: 480, height: 270 },
 }
@@ -52,3 +52,8 @@ function render() {
 }
 
 hallo.join(window.location.pathname, mediaConstraints, {addLocalStream, addRemoteStream, removeRemoteStream})
+
+document.getElementById('toggle').addEventListener('click', () => {
+  mediaConstraints.audio = !mediaConstraints.audio
+  hallo.changeConstraints(mediaConstraints)
+})
