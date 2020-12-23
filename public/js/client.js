@@ -46,8 +46,8 @@ function render() {
   }, "")
 }
 
-const showWebcam = () => navigator.mediaDevices.getUserMedia({ audio: false, video: true })
-const showMonitor = () => navigator.mediaDevices.getDisplayMedia({ video: {displaySurface: "monitor"} })
+const showWebcam = () => navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+const showMonitor = () => navigator.mediaDevices.getDisplayMedia({ audio: true, video: {displaySurface: "monitor"} })
 
 hallo.join(window.location.pathname, showWebcam, {addLocalStream, addRemoteStream, removeRemoteStream})
 
