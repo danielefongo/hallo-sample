@@ -12,23 +12,28 @@ const iceServers = {
 }
 
 const hallo = new HalloClient(iceServers)
-
 let localStream
-let streams = new Set()
 
 function addLocalStream(stream) {
   localStream = stream
-  render()
+  document.getElementById("local-video").srcObject = stream
 }
 
 function addRemoteStream(stream) {
-  streams.add(stream)
-  render()
+  if(document.getElementById(stream.id)) return
+
+  const div = `<video class="video" id="${stream.id}" autoplay="autoplay"></video>`
+  document.getElementById("videos").innerHTML += div
+  document.getElementById(stream.id).srcObject = stream
+  document.getElementById("local-video").srcObject = localStream
 }
 
 function removeRemoteStream(stream) {
-  streams.delete(stream)
-  render()
+  if(!document.getElementById(stream.id)) return
+
+  const element = document.getElementById(stream.id)
+  element.parentNode.removeChild(element)
+  document.getElementById("local-video").srcObject = localStream
 }
 
 window.addEventListener('beforeunload', (event) => {
@@ -37,25 +42,14 @@ window.addEventListener('beforeunload', (event) => {
   return undefined
 });
 
-function render() {
-  let html = `<video class="video" id="local-video" autoplay="autoplay" muted></video>`
+const audioOnly = () => navigator.mediaDevices.getUserMedia({ audio: true })
+const webcam = () => navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+const monitor = () => navigator.mediaDevices.getDisplayMedia({ audio: true, video: {displaySurface: "monitor"} })
 
-  html += [...streams].reduce((prev, stream) => {
-    return prev + `<video class="video" id="${stream.id}" autoplay="autoplay"></video>`
-  }, "")
+hallo.join(window.location.pathname, audioOnly, {addLocalStream, addRemoteStream, removeRemoteStream})
 
-  document.getElementById('videos').innerHTML = html
-
-  document.getElementById("local-video").srcObject = localStream
-  streams.forEach(stream => {
-    document.getElementById(stream.id).srcObject = stream
-  }, "")
+document.getElementById('show-monitor').onclick = () => hallo.changeMediaLambda(monitor)
+document.getElementById('show-webcam').onclick = () => hallo.changeMediaLambda(webcam)
+document.getElementById('toggle-video').onclick = () => {
+  localStream.getVideoTracks()[0].enabled = !localStream.getVideoTracks()[0].enabled
 }
-
-const showWebcam = () => navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-const showMonitor = () => navigator.mediaDevices.getDisplayMedia({ audio: true, video: {displaySurface: "monitor"} })
-
-hallo.join(window.location.pathname, showWebcam, {addLocalStream, addRemoteStream, removeRemoteStream})
-
-document.getElementById('show-monitor').onclick = () => hallo.changeMediaLambda(showMonitor)
-document.getElementById('show-webcam').onclick = () => hallo.changeMediaLambda(showWebcam)
