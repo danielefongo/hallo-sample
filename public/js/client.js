@@ -17,11 +17,7 @@ const iceServers = {
 const hallo = new HalloClient(iceServers)
 let remoteVideoStreams = {}
 
-function alreadyJoined({username, room}) {
-  alert(`${username} already joined on ${room}`)
-}
-
-function addLocalTrack(username, track) {
+function addLocalTrack({username, track}) {
   if(track.kind !== 'video') return
 
   const stream = new MediaStream([track])
@@ -29,13 +25,13 @@ function addLocalTrack(username, track) {
   document.getElementById("local-username").innerHTML = username
 }
 
-function removeLocalTrack(username, track) {
+function removeLocalTrack({track}) {
   if(track.kind !== 'video') return
 
   document.getElementById("local-video").srcObject = undefined
 }
 
-function addRemoteTrack(username, track) {
+function addRemoteTrack({username, track}) {
   if(track.kind !== 'video') return
 
   remoteVideoStreams[track.id] = {
@@ -45,7 +41,7 @@ function addRemoteTrack(username, track) {
   renderRemoteTracks()
 }
 
-function removeRemoteTrack(username, track) {
+function removeRemoteTrack({track}) {
   if(track.kind !== 'video') return
 
   delete remoteVideoStreams[track.id]
@@ -73,13 +69,17 @@ window.addEventListener('beforeunload', () => hallo.leave() && undefined);
 const webcam = () => navigator.mediaDevices.getUserMedia({ video: true })
 const monitor = () => navigator.mediaDevices.getDisplayMedia({ video: {displaySurface: "monitor"} })
 
-hallo.join(username, window.location.pathname, webcam, {
-  addLocalTrack,
-  removeLocalTrack,
-  addRemoteTrack,
-  removeRemoteTrack,
-  alreadyJoined
-})
+hallo.on('joined', (...data) => console.log('joined', ...data))
+hallo.on('left', (...data) => console.log('left', ...data))
+hallo.on('already_joined', ({username, room}) => alert(`${username} already joined on ${room}`))
+
+hallo.on('add_remote_track', addRemoteTrack)
+hallo.on('remove_remote_track', removeRemoteTrack)
+
+hallo.on('add_local_track', addLocalTrack)
+hallo.on('remove_local_track', removeLocalTrack)
+
+hallo.join(username, window.location.pathname, webcam)
 
 document.getElementById('show-monitor').onclick = () => hallo.changeMediaLambda(monitor)
 document.getElementById('show-webcam').onclick = () => hallo.changeMediaLambda(webcam)
