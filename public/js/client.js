@@ -1,5 +1,8 @@
 import '../css/style.scss';
 import HalloClient from 'hallo-client'
+import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
+
+const username = uniqueNamesGenerator({dictionaries: [colors, adjectives, animals]})
 
 const iceServers = {
   iceServers: [
@@ -14,27 +17,35 @@ const iceServers = {
 const hallo = new HalloClient(iceServers)
 let remoteVideoStreams = {}
 
-function addLocalTrack(track) {
+function alreadyJoined({username, room}) {
+  alert(`${username} already joined on ${room}`)
+}
+
+function addLocalTrack(username, track) {
   if(track.kind !== 'video') return
 
   const stream = new MediaStream([track])
   document.getElementById("local-video").srcObject = stream
+  document.getElementById("local-username").innerHTML = username
 }
 
-function removeLocalTrack(track) {
+function removeLocalTrack(username, track) {
   if(track.kind !== 'video') return
 
   document.getElementById("local-video").srcObject = undefined
 }
 
-function addRemoteTrack(track) {
+function addRemoteTrack(username, track) {
   if(track.kind !== 'video') return
 
-  remoteVideoStreams[track.id] = new MediaStream([track])
+  remoteVideoStreams[track.id] = {
+    username,
+    media: new MediaStream([track])
+  }
   renderRemoteTracks()
 }
 
-function removeRemoteTrack(track) {
+function removeRemoteTrack(username, track) {
   if(track.kind !== 'video') return
 
   delete remoteVideoStreams[track.id]
@@ -44,12 +55,16 @@ function removeRemoteTrack(track) {
 function renderRemoteTracks() {
   const streams = Object.values(remoteVideoStreams)
 
-  document.getElementById('videos').innerHTML = streams.reduce((prev, stream) => {
-    return prev + `<video class="video" id="${stream.id}" autoplay="autoplay"></video>`
+  document.getElementById('videos').innerHTML = streams.reduce((prev, {media, username}) => {
+    return prev + `
+      <div class="video-container">
+        <span>${username}</span>
+        <video class="video" id="${media.id}" autoplay="autoplay"></video>
+      </div>`
   }, "")
 
-  streams.forEach(stream => {
-    document.getElementById(stream.id).srcObject = stream
+  streams.forEach(({media}) => {
+    document.getElementById(media.id).srcObject = media
   }, "")
 }
 
@@ -58,7 +73,13 @@ window.addEventListener('beforeunload', () => hallo.leave() && undefined);
 const webcam = () => navigator.mediaDevices.getUserMedia({ video: true })
 const monitor = () => navigator.mediaDevices.getDisplayMedia({ video: {displaySurface: "monitor"} })
 
-hallo.join(window.location.pathname, webcam, {addLocalTrack, removeLocalTrack, addRemoteTrack, removeRemoteTrack})
+hallo.join(username, window.location.pathname, webcam, {
+  addLocalTrack,
+  removeLocalTrack,
+  addRemoteTrack,
+  removeRemoteTrack,
+  alreadyJoined
+})
 
 document.getElementById('show-monitor').onclick = () => hallo.changeMediaLambda(monitor)
 document.getElementById('show-webcam').onclick = () => hallo.changeMediaLambda(webcam)

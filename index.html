@@ -3,7 +3,10 @@
   <head><link rel="stylesheet" href="main.css"/></head>
 
   <body>
-    <video class="video" id="local-video" autoplay="autoplay" muted></video>
+    <div class="video-container">
+      <span id="local-username">${username}</span>
+      <video class="video" id="local-video" autoplay="autoplay" muted></video>
+    </div>
     <div>
       <button id="show-webcam">show webcam</button>
       <button id="show-monitor">show monitor</button>

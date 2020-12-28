@@ -8,9 +8,19 @@ body {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  align-content: flex-start;
 }
 
-.video {
+.video-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 10px;
   height: 50%;
   width: 50%;
+
+  & > .video {
+    height: 100%;
+    width: 100%;
+  }
 }
