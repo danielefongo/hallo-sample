@@ -12,44 +12,53 @@ const iceServers = {
 }
 
 const hallo = new HalloClient(iceServers)
-let localStream
+let remoteVideoStreams = {}
 
-function addLocalStream(stream) {
-  localStream = stream
+function addLocalTrack(track) {
+  if(track.kind !== 'video') return
+
+  const stream = new MediaStream([track])
   document.getElementById("local-video").srcObject = stream
 }
 
-function addRemoteStream(stream) {
-  if(document.getElementById(stream.id)) return
+function removeLocalTrack(track) {
+  if(track.kind !== 'video') return
 
-  const div = `<video class="video" id="${stream.id}" autoplay="autoplay"></video>`
-  document.getElementById("videos").innerHTML += div
-  document.getElementById(stream.id).srcObject = stream
-  document.getElementById("local-video").srcObject = localStream
+  document.getElementById("local-video").srcObject = undefined
 }
 
-function removeRemoteStream(stream) {
-  if(!document.getElementById(stream.id)) return
+function addRemoteTrack(track) {
+  if(track.kind !== 'video') return
 
-  const element = document.getElementById(stream.id)
-  element.parentNode.removeChild(element)
-  document.getElementById("local-video").srcObject = localStream
+  remoteVideoStreams[track.id] = new MediaStream([track])
+  renderRemoteTracks()
 }
 
-window.addEventListener('beforeunload', (event) => {
-  hallo.leave()
-  event.preventDefault();
-  return undefined
-});
+function removeRemoteTrack(track) {
+  if(track.kind !== 'video') return
 
-const audioOnly = () => navigator.mediaDevices.getUserMedia({ audio: true })
-const webcam = () => navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-const monitor = () => navigator.mediaDevices.getDisplayMedia({ audio: true, video: {displaySurface: "monitor"} })
+  delete remoteVideoStreams[track.id]
+  renderRemoteTracks()
+}
 
-hallo.join(window.location.pathname, audioOnly, {addLocalStream, addRemoteStream, removeRemoteStream})
+function renderRemoteTracks() {
+  const streams = Object.values(remoteVideoStreams)
+
+  document.getElementById('videos').innerHTML = streams.reduce((prev, stream) => {
+    return prev + `<video class="video" id="${stream.id}" autoplay="autoplay"></video>`
+  }, "")
+
+  streams.forEach(stream => {
+    document.getElementById(stream.id).srcObject = stream
+  }, "")
+}
+
+window.addEventListener('beforeunload', () => hallo.leave() && undefined);
+
+const webcam = () => navigator.mediaDevices.getUserMedia({ video: true })
+const monitor = () => navigator.mediaDevices.getDisplayMedia({ video: {displaySurface: "monitor"} })
+
+hallo.join(window.location.pathname, webcam, {addLocalTrack, removeLocalTrack, addRemoteTrack, removeRemoteTrack})
 
 document.getElementById('show-monitor').onclick = () => hallo.changeMediaLambda(monitor)
 document.getElementById('show-webcam').onclick = () => hallo.changeMediaLambda(webcam)
-document.getElementById('toggle-video').onclick = () => {
-  localStream.getVideoTracks()[0].enabled = !localStream.getVideoTracks()[0].enabled
-}

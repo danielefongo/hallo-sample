@@ -3,11 +3,12 @@
   <head><link rel="stylesheet" href="main.css"/></head>
 
   <body>
-    <button id="show-webcam">show webcam</button>
-    <button id="show-monitor">show monitor</button>
-    <button id="toggle-video">toggle video</button>
+    <video class="video" id="local-video" autoplay="autoplay" muted></video>
+    <div>
+      <button id="show-webcam">show webcam</button>
+      <button id="show-monitor">show monitor</button>
+    </div>
     <div id="videos">
-      <video class="video" id="local-video" autoplay="autoplay" muted></video>
     </div>
     <script type="text/javascript" src="main.js"></script>
   </body>

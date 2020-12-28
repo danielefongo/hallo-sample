@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "hallo-client": "^0.1.3",
+    "hallo-client": "^0.2.1",
     "hallo-server": "^0.1.0"
   },
   "devDependencies": {
