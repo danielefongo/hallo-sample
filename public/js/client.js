@@ -79,7 +79,10 @@ hallo.on('remove_remote_track', removeRemoteTrack)
 hallo.on('add_local_track', addLocalTrack)
 hallo.on('remove_local_track', removeLocalTrack)
 
+hallo.on('message', ({message}) => alert(message))
+
 hallo.join(username, window.location.pathname, webcam)
 
 document.getElementById('show-monitor').onclick = () => hallo.changeMediaLambda(monitor)
 document.getElementById('show-webcam').onclick = () => hallo.changeMediaLambda(webcam)
+document.getElementById('trill').onclick = () => hallo.send(prompt("username"), {message: `hallo from ${username}!`})
