@@ -1,0 +1,6 @@
+[submodule "hallo-server"]
+	path = hallo-server
+	url = git@github.com:danielefongo/hallo-server
+[submodule "hallo-client"]
+	path = hallo-client
+	url = git@github.com:danielefongo/hallo-client

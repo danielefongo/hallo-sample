@@ -5,6 +5,7 @@ Simple implementation of a multi-peer videochat using [hallo-server](https://www
 ## local usage
 
 ```
+git submodule init && git submodule update
 npm install
 npm run start-dev
 ```
@@ -12,6 +13,7 @@ npm run start-dev
 ## usage
 
 ```
+git submodule init && git submodule update
 npm install
 npm run build
 npm start
